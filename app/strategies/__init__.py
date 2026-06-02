@@ -1,0 +1,1 @@
+from app.strategies.moving_average import calculate_20ma, generate_trading_signals
