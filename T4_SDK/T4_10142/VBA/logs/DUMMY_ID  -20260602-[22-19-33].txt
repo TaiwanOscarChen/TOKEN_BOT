@@ -1,0 +1,22 @@
+[22:19:33.257] F:\gitlab\t4x64\t4\t4vs2019\t4.cpp(1073): ini_path=C:\Users\a0983\Documents\antigravity\agitated-einstein\T4_SDK\T4_10142\VBA\\t4.ini
+[22:19:33.257] F:\gitlab\t4x64\t4\t4vs2019\t4.cpp(1086): address=eleader.sinotrade.com.tw:443
+[22:19:33.257] F:\gitlab\t4x64\t4\t4vs2019\t4.cpp(1151): 開始回報
+[22:19:33.257] F:\gitlab\t4x64\t4\t4vs2019\t4.cpp(1152): 版本號碼: 10142
+[22:19:33.257] F:\gitlab\t4x64\t4\t4vs2019\t4.cpp(1751): init_socket
+[22:19:33.277] F:\gitlab\t4x64\t4\t4vs2019\t4.cpp(1627): check_version(DUMMY_ID)
+[22:19:33.277] F:\gitlab\t4x64\t4\t4vs2019\t4.cpp(1869): send_to_server_sock1
+[22:19:33.277] F:\gitlab\t4x64\t4\t4vs2019\t4.cpp(426): SEQ 1
+[22:19:33.277] F:\gitlab\t4x64\t4\t4vs2019\t4.cpp(1914): check_version [  T4   10142  DUMMY_ID]
+[22:19:33.278] F:\gitlab\t4x64\t4\t4vs2019\t4.cpp(4347): get_from_server_sock1 - called by check_version
+[22:19:33.288] F:\gitlab\t4x64\t4\t4vs2019\t4.cpp(4386): nHandle(0C11CCD7) SEQ 1
+[22:19:33.288] F:\gitlab\t4x64\t4\t4vs2019\t4.cpp(4465): alloc new 0x04da3450 tr=100138
+[22:19:33.288] F:\gitlab\t4x64\t4\t4vs2019\t4.cpp(4483): RQ: SEQ 1/ 400
+[22:19:33.288] F:\gitlab\t4x64\t4\t4vs2019\t4.cpp(4495): RecvQueue[1]=
+[22:19:33.288] F:\gitlab\t4x64\t4\t4vs2019\t4.cpp(1689): login(DUMMY_ID  )
+[22:19:33.288] F:\gitlab\t4x64\t4\t4vs2019\t4.cpp(1869): send_to_server_sock1
+[22:19:33.288] F:\gitlab\t4x64\t4\t4vs2019\t4.cpp(426): SEQ 2
+[22:19:33.288] F:\gitlab\t4x64\t4\t4vs2019\t4.cpp(4347): get_from_server_sock1 - called by login
+[22:19:33.293] F:\gitlab\t4x64\t4\t4vs2019\t4.cpp(4386): nHandle(08120713) SEQ 2
+[22:19:33.293] F:\gitlab\t4x64\t4\t4vs2019\t4.cpp(4483): RQ: SEQ 2/ 400
+[22:19:33.293] F:\gitlab\t4x64\t4\t4vs2019\t4.cpp(4495): RecvQueue[2]=Error: TR [72013] = 無此帳號, 請重新輸入  
+

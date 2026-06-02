@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>永豐金證券 API 測試啟用助手 (SinoPac API Verification Assistant)</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #070913;
+            --panel-bg: rgba(20, 24, 46, 0.4);
+            --panel-border: rgba(255, 255, 255, 0.08);
+            --cyan-accent: #00f0ff;
+            --purple-accent: #8b5cf6;
+            --success-color: #10b981;
+            --error-color: #f43f5e;
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+            --neon-glow: 0 0 20px rgba(0, 240, 255, 0.25);
+            --purple-glow: 0 0 20px rgba(139, 92, 246, 0.25);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Outfit', 'Noto Sans TC', sans-serif;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            background-image: 
+                radial-gradient(at 10% 20%, rgba(139, 92, 246, 0.15) 0px, transparent 50%),
+                radial-gradient(at 90% 80%, rgba(0, 240, 255, 0.1) 0px, transparent 50%);
+            background-attachment: fixed;
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem 1rem;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+            max-width: 800px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--cyan-accent), var(--purple-accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+            letter-spacing: 1px;
+            filter: drop-shadow(0 2px 8px rgba(0, 240, 255, 0.2));
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            font-weight: 300;
+        }
+
+        .main-container {
+            width: 100%;
+            max-width: 1280px;
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 2rem;
+            align-items: start;
+        }
+
+        @media (max-width: 1024px) {
+            .main-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Glassmorphic Panel Card */
+        .card {
+            background: var(--panel-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--panel-border);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            border-color: rgba(255, 255, 255, 0.15);
+        }
+
+        /* Tabs for selecting Shioaji vs T4 */
+        .tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid var(--panel-border);
+            padding-bottom: 0.8rem;
+        }
+
+        .tab-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            font-weight: 500;
+            cursor: pointer;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .tab-btn:hover {
+            color: var(--text-main);
+        }
+
+        .tab-btn.active {
+            color: var(--cyan-accent);
+            text-shadow: 0 0 10px rgba(0, 240, 255, 0.3);
+        }
+
+        .tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -0.9rem;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: var(--cyan-accent);
+            border-radius: 3px;
+            box-shadow: var(--neon-glow);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.4s ease;
+        }
+
+        /* Input fields design */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            font-size: 0.9rem;
+            color: var(--text-main);
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+
+        input {
+            width: 100%;
+            background: rgba(10, 12, 28, 0.8);
+            border: 1px solid var(--panel-border);
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            color: var(--text-main);
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--cyan-accent);
+            box-shadow: 0 0 10px rgba(0, 240, 255, 0.15);
+        }
+
+        input::placeholder {
+            color: #555c6d;
+        }
+
+        .info-text {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 0.3rem;
+            line-height: 1.4;
+        }
+
+        /* Test Buttons */
+        .btn-container {
+            margin-top: 2rem;
+        }
+
+        .btn-primary {
+            width: 100%;
+            background: linear-gradient(135deg, #00f0ff, #8b5cf6);
+            color: #000;
+            font-weight: 700;
+            border: none;
+            border-radius: 8px;
+            padding: 1rem;
+            font-size: 1.05rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: var(--neon-glow);
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 25px rgba(0, 240, 255, 0.4);
+            filter: brightness(1.1);
+        }
+
+        .btn-primary:active {
+            transform: translateY(1px);
+        }
+
+        /* Right column: Terminal & Progress monitor */
+        .console-card {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            min-height: 560px;
+        }
+
+        .console-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--panel-border);
+            padding-bottom: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .console-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--cyan-accent);
+        }
+
+        .status-badge {
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            background: rgba(156, 163, 175, 0.1);
+            color: var(--text-muted);
+            border: 1px solid rgba(156, 163, 175, 0.2);
+        }
+
+        .status-badge.idle {
+            background: rgba(156, 163, 175, 0.1);
+            color: var(--text-muted);
+            border-color: rgba(156, 163, 175, 0.2);
+        }
+
+        .status-badge.running {
+            background: rgba(139, 92, 246, 0.15);
+            color: var(--purple-accent);
+            border-color: rgba(139, 92, 246, 0.3);
+            animation: pulse 1.5s infinite;
+        }
+
+        .status-badge.success {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--success-color);
+            border-color: rgba(16, 185, 129, 0.3);
+        }
+
+        .status-badge.failed {
+            background: rgba(244, 63, 94, 0.15);
+            color: var(--error-color);
+            border-color: rgba(244, 63, 94, 0.3);
+        }
+
+        .terminal {
+            flex-grow: 1;
+            background: #03050a;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 1rem;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 0.88rem;
+            color: #10b981; /* Default terminal green */
+            overflow-y: auto;
+            max-height: 400px;
+            min-height: 300px;
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.8);
+            line-height: 1.5;
+        }
+
+        .terminal-line {
+            margin-bottom: 0.5rem;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        .terminal-line.info {
+            color: var(--text-main);
+        }
+
+        .terminal-line.warn {
+            color: #fbbf24;
+        }
+
+        .terminal-line.err {
+            color: var(--error-color);
+        }
+
+        .terminal-line.sys {
+            color: #60a5fa;
+        }
+
+        .terminal-line.success {
+            color: var(--success-color);
+            font-weight: bold;
+        }
+
+        .manual-steps {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 8px;
+            border: 1px dashed var(--panel-border);
+        }
+
+        .manual-steps h3 {
+            font-size: 0.95rem;
+            margin-bottom: 0.8rem;
+            color: var(--purple-accent);
+        }
+
+        .manual-steps ol {
+            padding-left: 1.2rem;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .manual-steps li {
+            margin-bottom: 0.4rem;
+            line-height: 1.4;
+        }
+
+        .manual-steps a {
+            color: var(--cyan-accent);
+            text-decoration: none;
+        }
+
+        .manual-steps a:hover {
+            text-decoration: underline;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.6; }
+            50% { opacity: 1; }
+            100% { opacity: 0.6; }
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 1rem;
+            height: 1rem;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #000;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 0.5rem;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>永豐金證券 API 測試啟用助手</h1>
+        <p class="subtitle">SinoPac Securities API Verification Assistant & Test Runner</p>
+    </header>
+
+    <div class="main-container">
+        <!-- Left Column: Input Forms -->
+        <div class="card">
+            <div class="tabs">
+                <button class="tab-btn active" onclick="switchTab('shioaji')">Shioaji (Python API)</button>
+                <button class="tab-btn" onclick="switchTab('t4')">T4 API (C++/VBA)</button>
+                <button class="tab-btn" onclick="switchTab('help')">啟用流程指引</button>
+            </div>
+
+            <!-- Shioaji Tab Content -->
+            <div id="shioaji-tab" class="tab-content active">
+                <form id="shioaji-form" onsubmit="runShioajiTest(event)">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="shioaji_api_key">API Key (金鑰)</label>
+                            <input type="text" id="shioaji_api_key" required placeholder="例如: K4R8f...">
+                        </div>
+                        <div class="form-group">
+                            <label for="shioaji_secret_key">Secret Key (密鑰)</label>
+                            <input type="password" id="shioaji_secret_key" required placeholder="輸入您的 Secret Key">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="shioaji_ca_path">CA 憑證路徑 (.pfx檔路徑) <span style="color: var(--text-muted); font-weight: normal;">(選填)</span></label>
+                            <input type="text" id="shioaji_ca_path" placeholder="C:\Users\...\Sinopac.pfx">
+                            <p class="info-text">模擬環境測試通常可免憑證。若下單失敗，建議輸入您的電子憑證檔案路徑。</p>
+                        </div>
+                        <div class="form-group">
+                            <label for="shioaji_ca_pass">CA 憑證密碼 <span style="color: var(--text-muted); font-weight: normal;">(選填)</span></label>
+                            <input type="password" id="shioaji_ca_pass" placeholder="輸入憑證密碼">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="shioaji_stock_code">測試股票代碼</label>
+                            <input type="text" id="shioaji_stock_code" value="2890">
+                            <p class="info-text">預設 2890 (永豐金)。</p>
+                        </div>
+                        <div class="form-group">
+                            <label for="shioaji_futures_code">測試期貨合約</label>
+                            <input type="text" id="shioaji_futures_code" value="TXFR1">
+                            <p class="info-text">預設 TXFR1 (台指期近月)。</p>
+                        </div>
+                    </div>
+
+                    <div class="btn-container">
+                        <button type="submit" id="shioaji-btn" class="btn-primary">
+                            <span id="shioaji-btn-text">執行 Shioaji 模擬下單測試</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- T4 Tab Content -->
+            <div id="t4-tab" class="tab-content">
+                <form id="t4-form" onsubmit="runT4Test(event)">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="t4_login_id">登入 ID (身份證字號)</label>
+                            <input type="text" id="t4_login_id" required placeholder="例如: A123456789">
+                        </div>
+                        <div class="form-group">
+                            <label for="t4_login_pass">登入密碼</label>
+                            <input type="password" id="t4_login_pass" required placeholder="永豐金證券登入密碼">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="t4_user_id">帳戶所屬身分證號 (通常與登入 ID 相同)</label>
+                        <input type="text" id="t4_user_id" required placeholder="例如: A123456789">
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="t4_stock_branch">證券分公司代碼</label>
+                            <input type="text" id="t4_stock_branch" required placeholder="例如: S9A95">
+                            <p class="info-text">通常為 S 開頭。例：S9A95</p>
+                        </div>
+                        <div class="form-group">
+                            <label for="t4_stock_account">證券帳號 (7位數字)</label>
+                            <input type="text" id="t4_stock_account" required placeholder="例如: 1234567">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="t4_futures_branch">期貨分公司代碼</label>
+                            <input type="text" id="t4_futures_branch" required placeholder="例如: F002000">
+                            <p class="info-text">通常為 F 開頭。例：F002000</p>
+                        </div>
+                        <div class="form-group">
+                            <label for="t4_futures_account">期貨帳號 (7位數字)</label>
+                            <input type="text" id="t4_futures_account" required placeholder="例如: 1234567">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="t4_stock_code">測試股票</label>
+                            <input type="text" id="t4_stock_code" value="2890">
+                        </div>
+                        <div class="form-group">
+                            <label for="t4_futures_code">測試期貨</label>
+                            <input type="text" id="t4_futures_code" value="TXFD3">
+                        </div>
+                    </div>
+
+                    <div class="btn-container">
+                        <button type="submit" id="t4-btn" class="btn-primary">
+                            <span id="t4-btn-text">執行 T4 API 驗證測試</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Help Tab Content -->
+            <div id="help-tab" class="tab-content">
+                <div class="manual-steps" style="margin-top: 0; background: transparent; border: none; padding: 0;">
+                    <h3 style="font-size: 1.2rem; margin-bottom: 1rem;">完整啟用 API 服務步驟</h3>
+                    <ol style="font-size: 0.95rem; padding-left: 1.5rem;">
+                        <li style="margin-bottom: 0.8rem;">
+                            <strong>步驟一：線上條款簽署</strong><br>
+                            前往 <a href="https://sinotrade.github.io/zh/tutor/prepare/terms/#api" target="_blank">永豐金線上簽署中心</a>，完成「API 電子交易風險預告書暨使用同意書」之簽署（證券與期貨帳戶需分別簽署）。
+                            <span style="display: block; color: var(--error-color); font-size: 0.85rem; margin-top: 0.2rem;">⚠️ 簽署完成的時間必須「早於」API 測試時間，否則測試紀錄將被視為無效。</span>
+                        </li>
+                        <li style="margin-bottom: 0.8rem;">
+                            <strong>步驟二：申請 API 金鑰 (API Key)</strong><br>
+                            前往 <a href="https://www.sinotrade.com.tw/newweb/PythonAPIKey/" target="_blank">永豐金 API 金鑰申請中心</a> 申請您的 API Key 與 Secret Key。
+                        </li>
+                        <li style="margin-bottom: 0.8rem;">
+                            <strong>步驟三：下載電子交易憑證</strong><br>
+                            至永豐金證券官網透過憑證管理工具，將您的下單交易憑證 (.pfx) 匯出保存至本地端。
+                        </li>
+                        <li style="margin-bottom: 0.8rem;">
+                            <strong>步驟四：執行本工具進行 API 測試</strong><br>
+                            <ul>
+                                <li>使用 <strong>Shioaji 標籤頁</strong>：輸入 API Key 等資訊，送出模擬下單委託。</li>
+                                <li>使用 <strong>T4 API 標籤頁</strong>：輸入身份證與帳號，送出驗證委託。</li>
+                            </ul>
+                            <span style="display: block; color: var(--success-color); font-size: 0.85rem; margin-top: 0.2rem;">⚡ 本工具已完全自動化此步驟，免去您手動撰寫代碼或操作 Excel VBA 的繁瑣。</span>
+                        </li>
+                        <li style="margin-bottom: 0.8rem;">
+                            <strong>步驟五：等待審核與重新登入</strong><br>
+                            測試成功送出後，測試數據會自動上傳永豐金伺服器，一般在<strong>營業日 14:01 ~ 17:59</strong> 期間審核最快約 10 分鐘開通。
+                            審核通過後，即可使用 `simulation=False` 連接正式交易環境下單！
+                        </li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column: Console / Log terminal -->
+        <div class="card console-card">
+            <div class="console-header">
+                <div class="console-title">執行狀態與終端日誌</div>
+                <div id="status-badge" class="status-badge idle">待機中</div>
+            </div>
+            
+            <div id="terminal" class="terminal">
+                <div class="terminal-line sys">[系統] 歡迎使用永豐金 API 測試啟用助手！</div>
+                <div class="terminal-line sys">[系統] 請選擇左側測試項目，填寫資料後點擊按鈕開始測試。</div>
+            </div>
+
+            <div class="manual-steps">
+                <h3>💡 測試須知與時間限制</h3>
+                <ol>
+                    <li>根據主管機關規定，測試必須在<strong>模擬模式 (Simulation = True)</strong> 下進行。</li>
+                    <li><strong>T4 API 測試開放時間：</strong>僅限營業日 <strong>14:01 ~ 17:59</strong>。</li>
+                    <li><strong>Shioaji API 測試開放時間：</strong>週一至週五 <strong>08:00 ~ 20:00</strong>。</li>
+                    <li>請確保您的網路通暢。測試過程中產生的模擬委託，均不會涉及真實資金交易，請放心測試。</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentTab = 'shioaji';
+
+        function switchTab(tabId) {
+            // Update tabs layout
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            // Activate selected tab
+            const activeBtn = Array.from(document.querySelectorAll('.tab-btn')).find(btn => btn.textContent.includes(tabId === 'shioaji' ? 'Shioaji' : (tabId === 't4' ? 'T4 API' : '啟用流程')));
+            if (activeBtn) activeBtn.classList.add('active');
+            
+            const activeTab = document.getElementById(`${tabId}-tab`);
+            if (activeTab) activeTab.classList.add('active');
+            
+            currentTab = tabId;
+            writeToTerminal(`[系統] 切換至 ${tabId === 'shioaji' ? 'Shioaji (Python API)' : (tabId === 't4' ? 'T4 API (C++/VBA)' : '啟用流程說明')} 模式`);
+        }
+
+        function writeToTerminal(text, type = 'info') {
+            const terminal = document.getElementById('terminal');
+            const line = document.createElement('div');
+            line.className = `terminal-line ${type}`;
+            
+            const now = new Date().toLocaleTimeString();
+            line.innerHTML = `[${now}] ${text}`;
+            
+            terminal.appendChild(line);
+            terminal.scrollTop = terminal.scrollHeight;
+        }
+
+        function clearTerminal() {
+            document.getElementById('terminal').innerHTML = '';
+        }
+
+        function updateStatusBadge(statusText, className) {
+            const badge = document.getElementById('status-badge');
+            badge.textContent = statusText;
+            badge.className = `status-badge ${className}`;
+        }
+
+        async function runShioajiTest(event) {
+            event.preventDefault();
+            
+            const btn = document.getElementById('shioaji-btn');
+            const btnText = document.getElementById('shioaji-btn-text');
+            
+            // Set loading state
+            btn.disabled = true;
+            btnText.innerHTML = '<span class="spinner"></span> 測試執行中...';
+            updateStatusBadge('測試中', 'running');
+            clearTerminal();
+            
+            writeToTerminal('開始執行 Shioaji (Python API) 驗證測試...', 'sys');
+            
+            const payload = {
+                api_key: document.getElementById('shioaji_api_key').value,
+                secret_key: document.getElementById('shioaji_secret_key').value,
+                ca_path: document.getElementById('shioaji_ca_path').value || null,
+                ca_passwd: document.getElementById('shioaji_ca_pass').value || null,
+                stock_code: document.getElementById('shioaji_stock_code').value || '2890',
+                futures_code: document.getElementById('shioaji_futures_code').value || 'TXFR1'
+            };
+
+            try {
+                const response = await fetch('/api/test-shioaji', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    // Print logs
+                    result.logs.forEach(log => {
+                        if (log.includes('Error') || log.includes('Failed')) {
+                            writeToTerminal(log, 'err');
+                        } else if (log.includes('Warning')) {
+                            writeToTerminal(log, 'warn');
+                        } else {
+                            writeToTerminal(log, 'info');
+                        }
+                    });
+                    
+                    writeToTerminal('🎉 Shioaji (Python API) 模擬下單測試成功！', 'success');
+                    writeToTerminal(`股票委託狀態: ${result.stock_status}`, 'success');
+                    writeToTerminal(`期貨委託狀態: ${result.futures_status}`, 'success');
+                    writeToTerminal('請等待 10 分鐘，審核完成後即可正常啟用正式環境！', 'sys');
+                    updateStatusBadge('測試成功', 'success');
+                } else {
+                    result.logs.forEach(log => writeToTerminal(log, 'err'));
+                    writeToTerminal(`❌ 測試失敗: ${result.error}`, 'err');
+                    updateStatusBadge('測試失敗', 'failed');
+                }
+            } catch (err) {
+                writeToTerminal(`❌ 發送請求失敗: ${err.message}`, 'err');
+                updateStatusBadge('網路錯誤', 'failed');
+            } finally {
+                btn.disabled = false;
+                btnText.textContent = '執行 Shioaji 模擬下單測試';
+            }
+        }
+
+        async function runT4Test(event) {
+            event.preventDefault();
+            
+            const btn = document.getElementById('t4-btn');
+            const btnText = document.getElementById('t4-btn-text');
+            
+            btn.disabled = true;
+            btnText.innerHTML = '<span class="spinner"></span> 測試執行中...';
+            updateStatusBadge('測試中', 'running');
+            clearTerminal();
+            
+            writeToTerminal('開始執行 T4 API 驗證測試...', 'sys');
+            
+            const payload = {
+                login_id: document.getElementById('t4_login_id').value,
+                login_pass: document.getElementById('t4_login_pass').value,
+                user_id: document.getElementById('t4_user_id').value,
+                stock_branch: document.getElementById('t4_stock_branch').value,
+                stock_account: document.getElementById('t4_stock_account').value,
+                futures_branch: document.getElementById('t4_futures_branch').value,
+                futures_account: document.getElementById('t4_futures_account').value,
+                stock_code: document.getElementById('t4_stock_code').value || '2890',
+                futures_code: document.getElementById('t4_futures_code').value || 'TXFD3'
+            };
+
+            writeToTerminal(`登入身分證: ${payload.login_id}`, 'info');
+            writeToTerminal(`證券帳號: ${payload.stock_branch}-${payload.stock_account}`, 'info');
+            writeToTerminal(`期貨帳號: ${payload.futures_branch}-${payload.futures_account}`, 'info');
+
+            try {
+                const response = await fetch('/api/test-t4', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    writeToTerminal('T4 DLL 初始化回應:', 'sys');
+                    writeToTerminal(result.init_message, 'info');
+                    writeToTerminal('T4 DLL 驗證送單回應:', 'sys');
+                    writeToTerminal(result.message, 'success');
+                    writeToTerminal('🎉 T4 API 證券與期貨驗證送單全部交付成功！', 'success');
+                    writeToTerminal('請等待 10 分鐘，審核完成後即可啟用 T4 API 服務。', 'sys');
+                    updateStatusBadge('測試成功', 'success');
+                } else {
+                    if (result.init_message) {
+                        writeToTerminal(`初始化回應: ${result.init_message}`, 'warn');
+                    }
+                    writeToTerminal(`❌ 測試失敗: ${result.message}`, 'err');
+                    updateStatusBadge('測試失敗', 'failed');
+                }
+            } catch (err) {
+                writeToTerminal(`❌ 發送請求失敗: ${err.message}`, 'err');
+                updateStatusBadge('網路錯誤', 'failed');
+            } finally {
+                btn.disabled = false;
+                btnText.textContent = '執行 T4 API 驗證測試';
+            }
+        }
+    </script>
+</body>
+</html>
