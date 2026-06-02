@@ -585,6 +585,39 @@
     <script>
         let currentTab = 'shioaji';
 
+        // Load pre-configured keys and accounts from server
+        window.addEventListener('DOMContentLoaded', async () => {
+            try {
+                const response = await fetch('/api/config');
+                const config = await response.json();
+                
+                if (config.api_key) {
+                    document.getElementById('shioaji_api_key').value = config.api_key;
+                }
+                if (config.secret_key) {
+                    document.getElementById('shioaji_secret_key').value = config.secret_key;
+                }
+                
+                // For T4 inputs
+                if (config.stock_branch) {
+                    document.getElementById('t4_stock_branch').value = config.stock_branch;
+                }
+                if (config.stock_account) {
+                    document.getElementById('t4_stock_account').value = config.stock_account;
+                }
+                if (config.futures_branch) {
+                    document.getElementById('t4_futures_branch').value = config.futures_branch;
+                }
+                if (config.futures_account) {
+                    document.getElementById('t4_futures_account').value = config.futures_account;
+                }
+                
+                writeToTerminal('[系統] 成功載入本地 API 金鑰與交易帳號設定。', 'sys');
+            } catch (err) {
+                console.error("Failed to load preconfigured config:", err);
+            }
+        });
+
         function switchTab(tabId) {
             // Update tabs layout
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));

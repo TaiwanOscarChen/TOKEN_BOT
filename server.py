@@ -6,6 +6,10 @@ import ctypes
 import os
 import time
 import traceback
+from dotenv import load_dotenv
+
+# Load .env file at startup
+load_dotenv(os.path.join(os.path.dirname(__file__), ".env"))
 
 app = FastAPI(title="SinoPac API Verification Assistant")
 
@@ -35,6 +39,17 @@ def read_index():
     index_path = os.path.join(os.path.dirname(__file__), "index.html")
     with open(index_path, "r", encoding="utf-8") as f:
         return f.read()
+
+@app.get("/api/config")
+def get_config():
+    return {
+        "api_key": os.environ.get("API_KEY", ""),
+        "secret_key": os.environ.get("SECRET_KEY", ""),
+        "stock_branch": os.environ.get("STOCK_BRANCH", ""),
+        "stock_account": os.environ.get("STOCK_ACCOUNT", ""),
+        "futures_branch": os.environ.get("FUTURES_BRANCH", ""),
+        "futures_account": os.environ.get("FUTURES_ACCOUNT", "")
+    }
 
 @app.post("/api/test-shioaji")
 def test_shioaji(req: ShioajiTestRequest):
