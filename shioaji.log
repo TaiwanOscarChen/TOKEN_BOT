@@ -1,0 +1,11 @@
+[pid:24500] 2026-06-03T02:10:32.027343Z  INFO shioaji::api::api_v1::auth::token_login: No cached token available, performing new login
+[pid:24500] 2026-06-03T02:10:32.555481Z  INFO shioaji::api::api_v1::auth::token_login: Stored new token in slot 1
+[pid:24500] 2026-06-03T02:10:34.725976Z  INFO shioaji::api::api_v1::contracts::api: Fetched 127 IND contracts (1 pages)
+[pid:24500] 2026-06-03T02:10:40.717385Z  INFO shioaji::api::api_v1::contracts::api: Fetched 42729 STK contracts (9 pages)
+[pid:24500] 2026-06-03T02:10:41.571834Z  INFO shioaji::api::api_v1::contracts::api: Fetched 2488 FUT contracts (1 pages)
+[pid:24500] 2026-06-03T02:10:45.676584Z  INFO shioaji::api::api_v1::contracts::api: Fetched 10415 OPT contracts (3 pages)
+[pid:24500] 2026-06-03T02:10:46.131302Z  INFO _core::api::auth::login: Loaded 55759 contracts after login
+[pid:24500] 2026-06-03T02:10:46.272430Z  WARN shioaji::api: Unknown P2P topic: #P2P/v:bcsolace01/Oryfkqqm/PYAPI/S124370989/0603/021032/028433100/210.61.157.145/TFT_ORDER
+[pid:24500] 2026-06-03T02:10:46.881523Z  INFO shioaji::api::token_pool: Removed invalid token from slot 1
+[pid:24500] 2026-06-03T02:10:46.929764Z  INFO shioaji::api: P2P receiver closed: Closed
+[pid:24500] 2026-06-03T02:10:46.930256Z  INFO shioaji::api: msg receiver error: Closed
