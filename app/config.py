@@ -25,5 +25,10 @@ class Settings:
     TELEGRAM_TOKEN: str = os.getenv("TELEGRAM_TOKEN", "")
     TELEGRAM_CHAT_ID: str = os.getenv("TELEGRAM_CHAT_ID", "")
     DEFAULT_TRADE_BUDGET: float = float(os.getenv("DEFAULT_TRADE_BUDGET", "100000"))
+    
+    # Shioaji Config
+    SHIOAJI_API_KEY: str = os.getenv("SHIOAJI_API_KEY", "")
+    SHIOAJI_SECRET_KEY: str = os.getenv("SHIOAJI_SECRET_KEY", "")
+    SHIOAJI_SIMULATION: bool = os.getenv("SHIOAJI_SIMULATION", "True").lower() == "true"
 
 settings = Settings()
