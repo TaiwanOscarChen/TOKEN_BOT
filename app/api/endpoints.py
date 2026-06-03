@@ -6,6 +6,7 @@ from app.models.stock import StockPrice, TradingSignal
 from app.schemas.stock import StockPriceCreate, StockPriceResponse, TradingSignalResponse
 from app.strategies.moving_average import generate_trading_signals
 from app.utils.notifier import send_telegram_alert
+from app.utils.shioaji_trader import place_simulated_order
 
 router = APIRouter()
 
@@ -122,6 +123,15 @@ def run_backtest(symbol: str, db: Session = Depends(get_db)):
                     price=latest_signal.price,
                     reason=latest_signal.reason
                 )
+                
+                # Automatically place simulated order for BUY or SELL signals
+                if latest_signal.signal_type in ["BUY", "SELL"]:
+                    shioaji_action = "Buy" if latest_signal.signal_type == "BUY" else "Sell"
+                    place_simulated_order(
+                        action=shioaji_action,
+                        symbol=latest_signal.symbol,
+                        price=latest_signal.price
+                    )
         else:
             db.commit()
             
